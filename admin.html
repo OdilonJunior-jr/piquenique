@@ -27,7 +27,7 @@
 </head>
 <body>
   <main class="page" id="adminView">
-    <header><div class="header-copy"><p class="eyebrow">Área administrativa</p><h1>Lista de presença</h1><p class="subtitle">Gerencie convidados e acompanhe os horários das confirmações.</p></div></header>
+    <header><div class="header-copy"><p class="eyebrow">Área administrativa</p><h1>Lista de presença</h1></div></header>
     <section class="stats"><div class="stat"><strong id="totalCount">0</strong><span>Total de convidados</span></div><div class="stat"><strong id="confirmedCount">0</strong><span>Presenças confirmadas</span></div></section>
     <section class="panel">
       <form class="add" id="guestForm"><input id="guestChild" type="text" placeholder="Nome da criança" required><input id="guestResponsible" type="text" placeholder="Nome do responsável" required><button type="submit">Adicionar convidado</button></form>
@@ -107,19 +107,17 @@
         const responsible=document.createElement('div');responsible.innerHTML='<strong></strong><small>Responsável</small>';responsible.querySelector('strong').textContent=guest.responsibleName;
         const status=document.createElement('span');status.className=`status ${guest.status}`;status.textContent=guest.status==='confirmed'?'Confirmado':'Pendente';
         const actions=document.createElement('div');actions.className='actions';
-        const action=document.createElement('button');action.className='action';action.type='button';action.textContent=guest.status==='confirmed'?'Tornar pendente':'Confirmar';
-        action.onclick=async()=>{
-          try{
-            if(guest.status==='confirmed'){
-              if(guest.confirmationId) await db.collection('confirmations').doc(guest.confirmationId).delete();
-              if(!guest.fromConfirmation) await db.collection('guests').doc(guest.id).set({status:'pending',confirmedAt:null,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
-            }else{
+        let action=null;
+        if(guest.status!=='confirmed'){
+          action=document.createElement('button');action.className='action';action.type='button';action.textContent='Confirmar';
+          action.onclick=async()=>{
+            try{
               await db.collection('guests').doc(guest.id).set({status:'confirmed',confirmedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
               guestRows=guestRows.map(item=>item.id===guest.id?{...item,status:'confirmed',confirmedAt:new Date()}:item);
               rebuildCache();
-            }
-          }catch(error){alert('Não foi possível atualizar.');console.error(error)}
-        };
+            }catch(error){alert('Não foi possível atualizar.');console.error(error)}
+          };
+        }
         const del=document.createElement('button');del.className='action delete-action';del.type='button';del.textContent='Excluir';
         del.onclick=async()=>{
           if(!confirm(`Excluir ${guest.childName} da lista?`)) return;
@@ -130,7 +128,8 @@
             await Promise.all(jobs);
           }catch(error){alert('Não foi possível excluir o convidado.');console.error(error)}
         };
-        actions.append(action,del);
+        if(action) actions.append(action);
+        actions.append(del);
         row.append(child,responsible,status,actions);list.append(row);
       });
     }
