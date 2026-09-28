@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#fff8e9">
   <title>Piquenique da Galerinha</title>
+  <link rel="preload" as="image" href="assets/hero-desktop-sunday-v4.png" media="(min-width:901px), (orientation:landscape)" fetchpriority="high">
+  <link rel="preload" as="image" href="assets/hero-mobile-sunday-v4.png" media="(max-width:900px) and (orientation:portrait)" fetchpriority="high">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Nunito:wght@700;800;900&amp;display=swap" rel="stylesheet">
@@ -26,12 +28,12 @@
       overflow:hidden;
       isolation:isolate;
     }
-    body::before{content:"";position:fixed;inset:-28px;z-index:-1;background:url("assets/hero-desktop-full.png") center/cover no-repeat;filter:blur(24px) brightness(.9) saturate(.92);opacity:.28;transform:scale(1.05)}
+    body::before{content:"";position:fixed;inset:-28px;z-index:-1;background:url("assets/hero-desktop-sunday-v4.png") center/cover no-repeat;filter:blur(24px) brightness(.9) saturate(.92);opacity:.28;transform:scale(1.05)}
 
     .hero{
       position:relative;
-      width:min(100vw,100dvh);
-      aspect-ratio:1 / 1;
+      width:100vw;
+      height:100dvh;
       flex:none;
       overflow:hidden;
       background:var(--cream);
@@ -46,19 +48,31 @@
     }
 
     .hero-picture img{
-      object-fit:contain;
+      object-fit:cover;
+      object-position:center;
       user-select:none;
       -webkit-user-drag:none;
+    }
+
+    .interaction-plane{
+      position:absolute;
+      z-index:6;
+      left:50%;
+      top:50%;
+      width:max(100vw,177.6833dvh);
+      aspect-ratio:1672 / 941;
+      transform:translate(-50%,-50%);
+      pointer-events:none;
     }
 
     /* Real button over the empty button area already designed in the artwork */
     .confirm-btn{
       position:absolute;
-      z-index:6;
-      left:54.3%;
-      top:58.35%;
-      width:40%;
-      height:5.25%;
+      z-index:2;
+      left:50.75%;
+      top:63.65%;
+      width:25.5%;
+      height:4.6%;
       min-height:0;
 
       border:0;
@@ -79,15 +93,16 @@
       transition:filter .2s ease,box-shadow .2s ease;
       overflow:hidden;
       animation:none;
+      pointer-events:auto;
     }
 
     .venue-card{
       position:absolute;
-      z-index:6;
-      left:64.2%;
-      top:49.1%;
-      width:23%;
-      height:7%;
+      z-index:2;
+      left:58.2%;
+      top:54.2%;
+      width:14.5%;
+      height:6.5%;
       display:block;
       padding:0;
       border-radius:24px;
@@ -95,6 +110,7 @@
       background:transparent;
       box-shadow:none;
       text-decoration:none;
+      pointer-events:auto;
     }
     .venue-card strong,.venue-card small,.venue-pin{display:none}
 
@@ -275,60 +291,35 @@
     .success-location:hover .success-location-arrow{transform:translateX(2px);background:#e8f1e3}
 
     .celebration-layer{position:fixed;inset:0;z-index:140;overflow:hidden;pointer-events:none}
-    .celebration-piece{position:absolute;left:var(--start-x);bottom:-14vh;width:var(--size);height:var(--size);object-fit:contain;opacity:0;will-change:transform,opacity;backface-visibility:hidden;contain:layout paint;animation-duration:var(--duration);animation-timing-function:cubic-bezier(.18,.7,.22,1);animation-delay:var(--delay);animation-fill-mode:both}
-    .piece--ball{animation-name:ballFlight}
-    .piece--heart{animation-name:heartFlight}
-    .piece--kite{animation-name:kiteFlight;transform-origin:50% 32%}
-    .piece--bear{animation-name:bearFlight;transform-origin:50% 72%}
+    .celebration-piece{position:absolute;left:var(--start-x);top:-18vh;width:var(--size);height:var(--size);object-fit:contain;opacity:0;will-change:transform,opacity;backface-visibility:hidden;contain:strict;transform:translate3d(0,-18vh,0);animation:imageRain var(--duration) linear var(--delay) both}
 
     @keyframes fade{from{opacity:0}to{opacity:1}}
     @keyframes pop{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
     @keyframes shine{0%,58%{transform:translateX(-72%)}82%,100%{transform:translateX(72%)}}
-    @keyframes ballFlight{
-      0%{opacity:0;transform:translate3d(0,12vh,0) rotate(0deg) scale(.25)}
-      6%{opacity:1}
-      34%{opacity:1;transform:translate3d(var(--burst-x),-82vh,0) rotate(var(--spin-mid)) scale(1.08)}
-      84%{opacity:1}
-      100%{opacity:0;transform:translate3d(var(--end-x),20vh,0) rotate(var(--spin-end)) scale(.82)}
-    }
-    @keyframes heartFlight{
-      0%{opacity:0;transform:translate3d(0,12vh,0) rotate(-8deg) scale(.25)}
-      7%{opacity:1}
-      36%{opacity:1;transform:translate3d(var(--burst-x),-78vh,0) rotate(10deg) scale(1.04)}
-      62%{transform:translate3d(calc(var(--burst-x) + 3vw),-48vh,0) rotate(-9deg) scale(.98)}
-      86%{opacity:1}
-      100%{opacity:0;transform:translate3d(var(--end-x),20vh,0) rotate(8deg) scale(.8)}
-    }
-    @keyframes kiteFlight{
-      0%{opacity:0;transform:translate3d(0,14vh,0) rotate(-5deg) scale(.3)}
+    @keyframes imageRain{
+      0%{opacity:0;transform:translate3d(0,-18vh,0) rotate(var(--rotate-start)) scale(.82)}
       8%{opacity:1}
-      38%{opacity:1;transform:translate3d(var(--burst-x),-76vh,0) rotate(6deg) scale(1)}
-      62%{transform:translate3d(calc(var(--burst-x) - 3vw),-52vh,0) rotate(-4deg) scale(.98)}
       88%{opacity:1}
-      100%{opacity:0;transform:translate3d(var(--end-x),18vh,0) rotate(5deg) scale(.82)}
-    }
-    @keyframes bearFlight{
-      0%{opacity:0;transform:translate3d(0,14vh,0) rotate(-3deg) scale(.28)}
-      8%{opacity:1}
-      36%{opacity:1;transform:translate3d(var(--burst-x),-74vh,0) rotate(4deg) scale(1)}
-      62%{transform:translate3d(calc(var(--burst-x) + 2vw),-48vh,0) rotate(-3deg) scale(.98)}
-      88%{opacity:1}
-      100%{opacity:0;transform:translate3d(var(--end-x),18vh,0) rotate(3deg) scale(.8)}
+      100%{opacity:0;transform:translate3d(var(--drift),128vh,0) rotate(var(--rotate-end)) scale(1)}
     }
 
     /* MOBILE — uses the actual mobile artwork, not a CSS recreation */
-    @media (max-width: 700px){
+    @media (max-width:900px) and (orientation:portrait){
       .hero{
-        width:min(100vw,66.6667dvh);
-        aspect-ratio:2 / 3;
+        width:100vw;
+        height:100dvh;
       }
-      body::before{background-image:url("assets/hero-mobile-full.png");filter:blur(22px) brightness(.9) saturate(.92);opacity:.25}
+      .interaction-plane{
+        width:max(100vw,46.2581dvh);
+        aspect-ratio:853 / 1844;
+      }
+      body::before{background-image:url("assets/hero-mobile-sunday-v4.png");filter:blur(26px) brightness(.82) saturate(.9);opacity:.4}
 
       .confirm-btn{
         left:50%;
-        top:59.2%;
-        width:68%;
-        height:6.1%;
+        top:55.05%;
+        width:69.5%;
+        height:4.2%;
         min-height:0;
         padding:0 10px;
         gap:6px;
@@ -336,7 +327,7 @@
         border-radius:13px;
       }
 
-      .venue-card{left:66.3%;top:50.3%;width:28%;height:6.3%;padding:0;background:transparent;box-shadow:none}
+      .venue-card{left:66.3%;top:48.7%;width:29%;height:5.3%;padding:0;background:transparent;box-shadow:none}
 
       .dialog{
         padding:24px 20px;
@@ -345,7 +336,7 @@
       .dialog h2{font-size:27px}
     }
 
-    @media (max-width:700px) and (max-height:620px){
+    @media (max-width:900px) and (orientation:portrait) and (max-height:620px){
       .modal{padding:8px}
       .dialog{max-height:calc(100dvh - 16px);padding:18px 16px;border-radius:20px}
       .dialog h2{margin:9px 0 4px;font-size:23px}
@@ -366,10 +357,11 @@
 
   <main class="hero">
     <picture class="hero-picture">
-      <source media="(max-width:700px)" srcset="assets/hero-mobile-full.png">
-      <img src="assets/hero-desktop-full.png" alt="Convite Piquenique da Galerinha">
+      <source media="(max-width:900px) and (orientation:portrait)" srcset="assets/hero-mobile-sunday-v4.png">
+      <img src="assets/hero-desktop-sunday-v4.png" alt="Convite Piquenique da Galerinha" fetchpriority="high" decoding="sync">
     </picture>
 
+    <div class="interaction-plane">
     <a class="venue-card"
        href="https://www.google.com/maps/search/?api=1&query=R.%20Nicolau%20Jo%C3%A3o%20Maluf%2C%20869%20-%20Cidade%20Nova%2C%20Uberaba%20-%20MG%2C%2038082-365"
        target="_blank"
@@ -386,6 +378,7 @@
       <span>Confirmar presença</span>
       <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
     </button>
+    </div>
   </main>
 
   <div class="celebration-layer" id="celebrationLayer" aria-hidden="true"></div>
@@ -470,31 +463,26 @@
       await celebrationReady;
       celebrationLayer.replaceChildren();
       const fragment=document.createDocumentFragment();
-      for(let index=0;index<36;index++){
+      for(let index=0;index<24;index++){
         const piece=document.createElement('img');
         const asset=celebrationAssets[index%celebrationAssets.length];
-        piece.className=`celebration-piece piece--${asset.type}`;
+        piece.className='celebration-piece';
         piece.src=asset.src;
         piece.alt='';
-        const direction=index%2===0?-1:1;
-        const burst=direction*(6+Math.random()*24);
-        const end=direction*(10+Math.random()*38);
         const sizeRoll=Math.random();
-        const baseSize=sizeRoll>.86?90+Math.random()*34:sizeRoll>.4?50+Math.random()*30:28+Math.random()*22;
-        const size=asset.type==='kite'?baseSize*1.3:asset.type==='bear'?baseSize*1.08:baseSize;
-        const lane=index%14;
-        piece.style.setProperty('--start-x',`${3.5+lane*7.15+(Math.random()*2.6-1.3)}vw`);
-        piece.style.setProperty('--burst-x',`${burst}vw`);
-        piece.style.setProperty('--end-x',`${end}vw`);
+        const baseSize=sizeRoll>.9?68+Math.random()*16:sizeRoll>.42?38+Math.random()*18:22+Math.random()*13;
+        const size=asset.type==='kite'?baseSize*1.08:asset.type==='bear'?baseSize*.88:baseSize;
+        piece.style.setProperty('--start-x',`${2+Math.random()*94}vw`);
+        piece.style.setProperty('--drift',`${(Math.random()-.5)*16}vw`);
         piece.style.setProperty('--size',`${size}px`);
-        piece.style.setProperty('--delay',`${Math.floor(index/14)*.32+Math.random()*.42}s`);
-        piece.style.setProperty('--duration',`${asset.type==='kite'?5.1+Math.random()*1.1:asset.type==='bear'?5+Math.random()*.9:4.3+Math.random()*1.25}s`);
-        piece.style.setProperty('--spin-mid',`${direction*(120+Math.random()*220)}deg`);
-        piece.style.setProperty('--spin-end',`${direction*(420+Math.random()*520)}deg`);
+        piece.style.setProperty('--delay',`${Math.random()*1.65}s`);
+        piece.style.setProperty('--duration',`${3.8+Math.random()*1.45}s`);
+        piece.style.setProperty('--rotate-start',`${-25+Math.random()*50}deg`);
+        piece.style.setProperty('--rotate-end',`${-150+Math.random()*300}deg`);
         fragment.append(piece);
       }
-      celebrationLayer.append(fragment);
-      window.setTimeout(()=>celebrationLayer.replaceChildren(),7200);
+      requestAnimationFrame(()=>celebrationLayer.append(fragment));
+      window.setTimeout(()=>celebrationLayer.replaceChildren(),7100);
     }
 
     function showModal(){
