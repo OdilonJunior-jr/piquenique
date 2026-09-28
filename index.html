@@ -292,7 +292,7 @@
     .success-location:hover .success-location-arrow{transform:translateX(2px);background:#e8f1e3}
 
     .celebration-layer{position:fixed;inset:0;z-index:140;overflow:hidden;pointer-events:none}
-    .celebration-piece{position:absolute;left:var(--start-x);top:-18vh;width:var(--size);height:var(--size);object-fit:contain;opacity:0;will-change:transform,opacity;backface-visibility:hidden;contain:strict;transform:translate3d(0,-18vh,0);animation:imageRain var(--duration) linear var(--delay) both}
+    .celebration-piece{position:absolute;left:var(--start-x);top:-18vh;width:clamp(96px,7vw,128px);height:clamp(96px,7vw,128px);object-fit:contain;opacity:0;will-change:transform,opacity;backface-visibility:hidden;contain:strict;transform:translate3d(0,-18vh,0);animation:imageRain var(--duration) linear var(--delay) both}
 
     @keyframes fade{from{opacity:0}to{opacity:1}}
     @keyframes pop{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
@@ -364,7 +364,7 @@
 
     <div class="interaction-plane">
     <a class="venue-card"
-       href="https://www.google.com/maps/search/?api=1&query=R.%20Nicolau%20Jo%C3%A3o%20Maluf%2C%20869%20-%20Cidade%20Nova%2C%20Uberaba%20-%20MG%2C%2038082-365"
+       href="https://www.google.com/maps/search/?api=1&query=R.%20Nicolau%20Jo%C3%A3o%20Maluf%2C%20860%20-%20Cidade%20Nova%2C%20Uberaba%20-%20MG%2C%2038082-365"
        target="_blank"
        rel="noopener noreferrer"
        aria-label="Abrir Canteiro Fest. no Google Maps">
@@ -410,9 +410,9 @@
         <div class="check"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></svg></div>
         <h2>Presença confirmada!</h2>
         <p id="successMessage">Tudo certo. Esperamos vocês!</p>
-        <a class="success-location" href="https://www.google.com/maps/search/?api=1&query=R.%20Nicolau%20Jo%C3%A3o%20Maluf%2C%20869%20-%20Cidade%20Nova%2C%20Uberaba%20-%20MG%2C%2038082-365" target="_blank" rel="noopener noreferrer" aria-label="Abrir o local do evento no Google Maps">
+        <a class="success-location" href="https://www.google.com/maps/search/?api=1&query=R.%20Nicolau%20Jo%C3%A3o%20Maluf%2C%20860%20-%20Cidade%20Nova%2C%20Uberaba%20-%20MG%2C%2038082-365" target="_blank" rel="noopener noreferrer" aria-label="Abrir o local do evento no Google Maps">
           <span class="success-location-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"/></svg></span>
-          <span class="success-location-copy"><small>Local do evento</small><strong>Canteiro Fest.</strong><span>R. Nicolau João Maluf, 869 · Cidade Nova, Uberaba/MG</span></span>
+          <span class="success-location-copy"><small>Local do evento</small><strong>Canteiro Fest.</strong><span>R. Nicolau João Maluf, 860 · Cidade Nova, Uberaba/MG</span></span>
           <span class="success-location-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
         </a>
         <button class="submit" id="finish" type="button">Fechar</button>
@@ -420,7 +420,13 @@
     </div>
   </section>
 
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="config.js"></script>
   <script>
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
     const modal = document.querySelector('#modal');
     const open = document.querySelector('#openModal');
     const close = document.querySelector('#closeModal');
@@ -429,7 +435,6 @@
     const success = document.querySelector('#success');
     const message = document.querySelector('#successMessage');
     const celebrationLayer = document.querySelector('#celebrationLayer');
-    const STORE_KEY = 'piquenique_convidados';
     const celebrationAssets = [
       {src:'assets/celebration/bola-anim.png',type:'ball'},
       {src:'assets/celebration/bola-listrada-anim.png',type:'ball'},
@@ -440,42 +445,27 @@
       {src:'assets/celebration/pipa-anim.png',type:'kite'},
       {src:'assets/celebration/pipa-rabiola-anim.png',type:'kite'},
       {src:'assets/celebration/pipa-sol-anim.png',type:'kite'},
-      {src:'assets/celebration/ursinho-anim.png',type:'bear'}
+      {src:'assets/celebration/ursinho-anim.png',type:'bear'},
+      {src:'assets/celebration/pirulito-anim.png',type:'candy'},
+      {src:'assets/celebration/bala-anim.png',type:'candy'},
+      {src:'assets/celebration/bombom-anim.png',type:'candy'},
+      {src:'assets/celebration/picole-anim.png',type:'candy'}
     ];
     const celebrationReady=Promise.all(celebrationAssets.map(asset=>new Promise(resolve=>{const image=new Image();image.onload=()=>image.decode?image.decode().catch(()=>{}).finally(resolve):resolve();image.onerror=resolve;image.src=asset.src})));
-
-    function normalize(value){
-      return value.trim().toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-    }
-
-    function getGuests(){
-      const saved = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
-      if(saved.length) return saved;
-      const legacy = JSON.parse(localStorage.getItem('piquenique_confirmacoes') || '[]');
-      const migrated = legacy.map((item,index)=>({id:`legacy-${index}-${Date.now()}`,childName:item.childName,responsibleName:item.responsibleName,status:'confirmed',confirmedAt:item.confirmedAt || new Date().toISOString()}));
-      if(migrated.length) localStorage.setItem(STORE_KEY,JSON.stringify(migrated));
-      return migrated;
-    }
-
-    function saveGuests(guests){ localStorage.setItem(STORE_KEY,JSON.stringify(guests)); }
 
     async function launchCelebration(){
       if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       await celebrationReady;
       celebrationLayer.replaceChildren();
       const fragment=document.createDocumentFragment();
-      for(let index=0;index<24;index++){
+      for(let index=0;index<28;index++){
         const piece=document.createElement('img');
         const asset=celebrationAssets[index%celebrationAssets.length];
         piece.className='celebration-piece';
         piece.src=asset.src;
         piece.alt='';
-        const sizeRoll=Math.random();
-        const baseSize=sizeRoll>.9?68+Math.random()*16:sizeRoll>.42?38+Math.random()*18:22+Math.random()*13;
-        const size=asset.type==='kite'?baseSize*1.08:asset.type==='bear'?baseSize*.88:baseSize;
         piece.style.setProperty('--start-x',`${2+Math.random()*94}vw`);
         piece.style.setProperty('--drift',`${(Math.random()-.5)*16}vw`);
-        piece.style.setProperty('--size',`${size}px`);
         piece.style.setProperty('--delay',`${Math.random()*1.65}s`);
         piece.style.setProperty('--duration',`${3.8+Math.random()*1.45}s`);
         piece.style.setProperty('--rotate-start',`${-25+Math.random()*50}deg`);
@@ -511,29 +501,36 @@
       if(e.key === 'Escape' && modal.classList.contains('open')) hideModal();
     });
 
-    form.addEventListener('submit', e => {
+    form.addEventListener('submit', async e => {
       e.preventDefault();
 
       const childName = document.querySelector('#childName').value.trim();
       const responsibleName = document.querySelector('#responsibleName').value.trim();
       if(!childName || !responsibleName) return;
 
-      /*
-        DEMONSTRAÇÃO:
-        Neste HTML, a confirmação é salva localmente.
-        Depois basta trocar este trecho pelo INSERT no Supabase.
-      */
-      const guests = getGuests();
-      const match = guests.find(item=>item.status==='pending' && (normalize(item.childName)===normalize(childName) || normalize(item.responsibleName)===normalize(responsibleName)));
-      if(match){
-        match.childName=childName;
-        match.responsibleName=responsibleName;
-        match.status='confirmed';
-        match.confirmedAt=new Date().toISOString();
-      }else{
-        guests.push({id:crypto.randomUUID(),childName,responsibleName,status:'confirmed',confirmedAt:new Date().toISOString()});
+      const submitButton = form.querySelector('.submit');
+      const originalText = submitButton.textContent;
+      submitButton.disabled = true;
+      submitButton.textContent = 'Confirmando...';
+
+      try {
+        await db.collection('confirmations').add({
+          childName,
+          responsibleName,
+          status: 'confirmed',
+          confirmedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (error) {
+        console.error(error);
+        submitButton.disabled = false;
+        submitButton.textContent = originalText;
+        alert('Não foi possível confirmar agora. Verifique a conexão e tente novamente.');
+        return;
       }
-      saveGuests(guests);
+
+      submitButton.disabled = false;
+      submitButton.textContent = originalText;
 
       message.textContent = `${childName} está confirmado(a). Obrigado, ${responsibleName}!`;
       form.classList.add('hide');

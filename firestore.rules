@@ -1,13 +1,10 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    function isSignedIn() {
-      return request.auth != null;
-    }
+    // Projeto temporário sem login administrativo.
+    // ATENÇÃO: quem descobrir a configuração do Firebase também poderá acessar estes dados.
 
     match /confirmations/{confirmationId} {
-      // A página pública só pode ENVIAR uma confirmação.
       allow create: if
         request.resource.data.keys().hasOnly([
           'childName', 'responsibleName', 'status', 'confirmedAt', 'createdAt'
@@ -20,13 +17,12 @@ service cloud.firestore {
         request.resource.data.responsibleName.size() <= 120 &&
         request.resource.data.status == 'confirmed';
 
-      // Só o administrador autenticado pode consultar, alterar ou excluir.
-      allow read, update, delete: if isSignedIn();
+      // Necessário para o painel sem login abrir, alterar e excluir confirmações.
+      allow read, update, delete: if true;
     }
 
     match /guests/{guestId} {
-      // Lista de convidados fica totalmente privada.
-      allow read, create, update, delete: if isSignedIn();
+      allow read, create, update, delete: if true;
     }
   }
 }
