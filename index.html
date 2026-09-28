@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#fff8e9">
+  <title>Piquenique da Galerinha</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Nunito:wght@700;800;900&amp;display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --green:#235b31;
+      --green2:#3c8346;
+      --yellow:#f4b321;
+      --cream:#fff8e9;
+      --text:#173b22;
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;width:100%;height:100%;background:var(--cream);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text)}
+    body{
+      min-height:100dvh;
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+      isolation:isolate;
+    }
+    body::before{content:"";position:fixed;inset:-28px;z-index:-1;background:url("assets/hero-desktop-full.png") center/cover no-repeat;filter:blur(24px) brightness(.9) saturate(.92);opacity:.28;transform:scale(1.05)}
+
+    .hero{
+      position:relative;
+      width:min(100vw,100dvh);
+      aspect-ratio:1 / 1;
+      flex:none;
+      overflow:hidden;
+      background:var(--cream);
+      box-shadow:0 0 50px rgba(35,91,49,.08);
+    }
+
+    .hero-picture,
+    .hero-picture img{
+      width:100%;
+      height:100%;
+      display:block;
+    }
+
+    .hero-picture img{
+      object-fit:contain;
+      user-select:none;
+      -webkit-user-drag:none;
+    }
+
+    /* Real button over the empty button area already designed in the artwork */
+    .confirm-btn{
+      position:absolute;
+      z-index:6;
+      left:54.3%;
+      top:58.35%;
+      width:40%;
+      height:5.25%;
+      min-height:0;
+
+      border:0;
+      border-radius:14px;
+      cursor:pointer;
+      color:#fff;
+      font-family:Nunito,Inter,sans-serif;
+      font-weight:900;
+      font-size:clamp(9px,1.14vw,16px);
+      letter-spacing:.01em;
+      background:linear-gradient(135deg,#43894c,#245d31);
+      box-shadow:0 12px 28px rgba(23,75,37,.25);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      transform:translateX(-50%);
+      transition:filter .2s ease,box-shadow .2s ease;
+      overflow:hidden;
+      animation:none;
+    }
+
+    .venue-card{
+      position:absolute;
+      z-index:6;
+      left:64.2%;
+      top:49.1%;
+      width:23%;
+      height:7%;
+      display:block;
+      padding:0;
+      border-radius:24px;
+      color:#b64028;
+      background:transparent;
+      box-shadow:none;
+      text-decoration:none;
+    }
+    .venue-card strong,.venue-card small,.venue-pin{display:none}
+
+    .confirm-btn::after{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.34) 50%,transparent 62%);
+      transform:translateX(-70%);
+      animation:shine 3.8s ease-in-out infinite;
+    }
+
+    .confirm-btn span,
+    .confirm-btn svg{position:relative;z-index:1}
+    .confirm-btn svg{width:clamp(13px,1.55vw,20px);height:clamp(13px,1.55vw,20px)}
+
+    .confirm-btn:hover{
+      transform:translateX(-50%);
+      box-shadow:0 12px 28px rgba(23,75,37,.25);
+      filter:none;
+    }
+    .confirm-btn:active{transform:translateX(-50%)}
+
+    /* Modal */
+    .modal{
+      position:fixed;
+      inset:0;
+      z-index:100;
+      display:none;
+      place-items:center;
+      padding:18px;
+      background:rgba(15,44,23,.52);
+      backdrop-filter:blur(10px);
+    }
+    .modal.open{
+      display:grid;
+      animation:fade .2s ease both;
+    }
+
+    .dialog{
+      width:min(480px,100%);
+      max-height:calc(100dvh - 36px);
+      overflow:auto;
+      position:relative;
+      padding:28px;
+      border-radius:24px;
+      background:#fffdf7;
+      box-shadow:0 30px 90px rgba(10,35,17,.35);
+      border:1px solid rgba(35,91,49,.08);
+      animation:pop .32s cubic-bezier(.2,.8,.2,1) both;
+    }
+
+    .close{
+      position:absolute;
+      right:15px;
+      top:15px;
+      width:40px;
+      height:40px;
+      border:0;
+      border-radius:50%;
+      cursor:pointer;
+      color:var(--green);
+      background:#edf4e8;
+      display:grid;
+      place-items:center;
+      line-height:0;
+    }
+    .close svg{width:19px;height:19px}
+
+    .tag{
+      display:inline-block;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#fff0bd;
+      color:#78580a;
+      font-size:12px;
+      font-weight:800;
+    }
+
+    .dialog h2{
+      margin:14px 0 7px;
+      color:var(--green);
+      font-family:Nunito,Inter,sans-serif;
+      font-size:30px;
+      font-weight:900;
+      letter-spacing:-.035em;
+    }
+    .dialog p{
+      margin:0 0 20px;
+      color:#58705c;
+      line-height:1.45;
+    }
+
+    .field{margin-bottom:14px}
+    .field label{
+      display:block;
+      margin:0 0 7px;
+      color:#315d3b;
+      font-weight:800;
+      font-size:13px;
+    }
+    .field input{
+      width:100%;
+      height:54px;
+      border:1px solid #dbe6d6;
+      background:#fff;
+      color:#1a4025;
+      border-radius:15px;
+      padding:0 15px;
+      outline:none;
+      font-size:16px;
+      transition:.2s;
+    }
+    .field input:focus{
+      border-color:#82aa77;
+      box-shadow:0 0 0 4px rgba(61,131,70,.11);
+    }
+    button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid rgba(244,179,33,.55);outline-offset:3px}
+
+    .submit{
+      width:100%;
+      height:58px;
+      margin-top:3px;
+      border:0;
+      border-radius:16px;
+      cursor:pointer;
+      background:linear-gradient(135deg,#43894c,#245d31);
+      color:#fff;
+      font-family:Nunito,Inter,sans-serif;
+      font-weight:900;
+      font-size:17px;
+      box-shadow:0 12px 28px rgba(23,75,37,.22);
+    }
+
+    .success{
+      display:none;
+      text-align:center;
+      padding:14px 0 2px;
+    }
+    .success.show{display:block}
+    .form.hide{display:none}
+    .check{
+      width:72px;height:72px;
+      margin:0 auto 12px;
+      display:grid;place-items:center;
+      border-radius:50%;
+      background:#eaf4df;
+      color:var(--green);
+      box-shadow:inset 0 0 0 1px rgba(35,91,49,.05);
+    }
+    .check svg{width:34px;height:34px;stroke-width:2.4}
+
+    .success-location{
+      display:grid;
+      grid-template-columns:46px minmax(0,1fr) 38px;
+      align-items:center;
+      gap:13px;
+      margin:20px 0 18px;
+      padding:15px 16px;
+      border:1px solid rgba(35,91,49,.12);
+      border-radius:18px;
+      background:linear-gradient(135deg,#f8faf3,#eef5e9);
+      color:var(--text);
+      text-align:left;
+      text-decoration:none;
+      box-shadow:0 8px 24px rgba(35,91,49,.07);
+      transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+    }
+    .success-location:hover{transform:translateY(-2px);border-color:rgba(35,91,49,.25);box-shadow:0 14px 30px rgba(35,91,49,.13)}
+    .success-location-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(145deg,#ffd6c4,#f3aa8d);color:#b83f29;box-shadow:inset 0 1px rgba(255,255,255,.65)}
+    .success-location-icon svg{width:24px;height:24px}
+    .success-location-copy{min-width:0}
+    .success-location-copy small{display:block;margin-bottom:4px;color:#758177;font-size:9px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;text-decoration:none}
+    .success-location-copy strong{display:block;color:#244f2f;font-size:16px;line-height:1.15;text-decoration:none}
+    .success-location-copy span{display:block;margin-top:5px;color:#5d6e60;font-size:12px;line-height:1.35;text-decoration:none}
+    .success-location-arrow{width:38px;height:38px;display:grid;place-items:center;border-radius:50%;background:#fff;color:var(--green);box-shadow:0 5px 14px rgba(35,91,49,.11);transition:transform .2s ease,background-color .2s ease}
+    .success-location-arrow svg{width:18px;height:18px}
+    .success-location:hover .success-location-arrow{transform:translateX(2px);background:#e8f1e3}
+
+    .celebration-layer{position:fixed;inset:0;z-index:140;overflow:hidden;pointer-events:none}
+    .celebration-piece{position:absolute;left:var(--start-x);bottom:-14vh;width:var(--size);height:var(--size);object-fit:contain;opacity:0;will-change:transform,opacity;backface-visibility:hidden;contain:layout paint;animation-duration:var(--duration);animation-timing-function:cubic-bezier(.18,.7,.22,1);animation-delay:var(--delay);animation-fill-mode:both}
+    .piece--ball{animation-name:ballFlight}
+    .piece--heart{animation-name:heartFlight}
+    .piece--kite{animation-name:kiteFlight;transform-origin:50% 32%}
+    .piece--bear{animation-name:bearFlight;transform-origin:50% 72%}
+
+    @keyframes fade{from{opacity:0}to{opacity:1}}
+    @keyframes pop{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+    @keyframes shine{0%,58%{transform:translateX(-72%)}82%,100%{transform:translateX(72%)}}
+    @keyframes ballFlight{
+      0%{opacity:0;transform:translate3d(0,12vh,0) rotate(0deg) scale(.25)}
+      6%{opacity:1}
+      34%{opacity:1;transform:translate3d(var(--burst-x),-82vh,0) rotate(var(--spin-mid)) scale(1.08)}
+      84%{opacity:1}
+      100%{opacity:0;transform:translate3d(var(--end-x),20vh,0) rotate(var(--spin-end)) scale(.82)}
+    }
+    @keyframes heartFlight{
+      0%{opacity:0;transform:translate3d(0,12vh,0) rotate(-8deg) scale(.25)}
+      7%{opacity:1}
+      36%{opacity:1;transform:translate3d(var(--burst-x),-78vh,0) rotate(10deg) scale(1.04)}
+      62%{transform:translate3d(calc(var(--burst-x) + 3vw),-48vh,0) rotate(-9deg) scale(.98)}
+      86%{opacity:1}
+      100%{opacity:0;transform:translate3d(var(--end-x),20vh,0) rotate(8deg) scale(.8)}
+    }
+    @keyframes kiteFlight{
+      0%{opacity:0;transform:translate3d(0,14vh,0) rotate(-5deg) scale(.3)}
+      8%{opacity:1}
+      38%{opacity:1;transform:translate3d(var(--burst-x),-76vh,0) rotate(6deg) scale(1)}
+      62%{transform:translate3d(calc(var(--burst-x) - 3vw),-52vh,0) rotate(-4deg) scale(.98)}
+      88%{opacity:1}
+      100%{opacity:0;transform:translate3d(var(--end-x),18vh,0) rotate(5deg) scale(.82)}
+    }
+    @keyframes bearFlight{
+      0%{opacity:0;transform:translate3d(0,14vh,0) rotate(-3deg) scale(.28)}
+      8%{opacity:1}
+      36%{opacity:1;transform:translate3d(var(--burst-x),-74vh,0) rotate(4deg) scale(1)}
+      62%{transform:translate3d(calc(var(--burst-x) + 2vw),-48vh,0) rotate(-3deg) scale(.98)}
+      88%{opacity:1}
+      100%{opacity:0;transform:translate3d(var(--end-x),18vh,0) rotate(3deg) scale(.8)}
+    }
+
+    /* MOBILE — uses the actual mobile artwork, not a CSS recreation */
+    @media (max-width: 700px){
+      .hero{
+        width:min(100vw,66.6667dvh);
+        aspect-ratio:2 / 3;
+      }
+      body::before{background-image:url("assets/hero-mobile-full.png");filter:blur(22px) brightness(.9) saturate(.92);opacity:.25}
+
+      .confirm-btn{
+        left:50%;
+        top:59.2%;
+        width:68%;
+        height:6.1%;
+        min-height:0;
+        padding:0 10px;
+        gap:6px;
+        font-size:clamp(9px,3vw,13px);
+        border-radius:13px;
+      }
+
+      .venue-card{left:66.3%;top:50.3%;width:28%;height:6.3%;padding:0;background:transparent;box-shadow:none}
+
+      .dialog{
+        padding:24px 20px;
+        border-radius:24px;
+      }
+      .dialog h2{font-size:27px}
+    }
+
+    @media (max-width:700px) and (max-height:620px){
+      .modal{padding:8px}
+      .dialog{max-height:calc(100dvh - 16px);padding:18px 16px;border-radius:20px}
+      .dialog h2{margin:9px 0 4px;font-size:23px}
+      .dialog p{margin-bottom:12px;font-size:13px}
+      .field{margin-bottom:9px}
+      .field label{margin-bottom:4px}
+      .field input{height:45px}
+      .submit{height:48px}
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .confirm-btn,.confirm-btn::after,.modal.open,.dialog{animation:none!important}
+      .celebration-layer{display:none!important}
+    }
+  </style>
+</head>
+<body>
+
+  <main class="hero">
+    <picture class="hero-picture">
+      <source media="(max-width:700px)" srcset="assets/hero-mobile-full.png">
+      <img src="assets/hero-desktop-full.png" alt="Convite Piquenique da Galerinha">
+    </picture>
+
+    <a class="venue-card"
+       href="https://www.google.com/maps/search/?api=1&query=R.%20Nicolau%20Jo%C3%A3o%20Maluf%2C%20869%20-%20Cidade%20Nova%2C%20Uberaba%20-%20MG%2C%2038082-365"
+       target="_blank"
+       rel="noopener noreferrer"
+       aria-label="Abrir Canteiro Fest. no Google Maps">
+    </a>
+
+    <button class="confirm-btn" id="openModal" type="button">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M19 8v6M22 11h-6"/>
+      </svg>
+      <span>Confirmar presença</span>
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+    </button>
+  </main>
+
+  <div class="celebration-layer" id="celebrationLayer" aria-hidden="true"></div>
+
+  <section class="modal" id="modal" aria-hidden="true">
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+      <button class="close" id="closeModal" type="button" aria-label="Fechar"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+
+      <form class="form" id="presenceForm">
+        <span class="tag">Piquenique da Galerinha</span>
+        <h2 id="dialogTitle">Confirmar presença</h2>
+        <p>Informe o nome da criança e do responsável.</p>
+
+        <div class="field">
+          <label for="childName">Nome da criança</label>
+          <input id="childName" name="childName" type="text" placeholder="Ex.: Ana Clara" required>
+        </div>
+
+        <div class="field">
+          <label for="responsibleName">Nome do responsável</label>
+          <input id="responsibleName" name="responsibleName" type="text" placeholder="Ex.: Juliana Martins" required>
+        </div>
+
+        <button class="submit" type="submit">Confirmar presença</button>
+      </form>
+
+      <div class="success" id="success">
+        <div class="check"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></svg></div>
+        <h2>Presença confirmada!</h2>
+        <p id="successMessage">Tudo certo. Esperamos vocês!</p>
+        <a class="success-location" href="https://www.google.com/maps/search/?api=1&query=R.%20Nicolau%20Jo%C3%A3o%20Maluf%2C%20869%20-%20Cidade%20Nova%2C%20Uberaba%20-%20MG%2C%2038082-365" target="_blank" rel="noopener noreferrer" aria-label="Abrir o local do evento no Google Maps">
+          <span class="success-location-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"/></svg></span>
+          <span class="success-location-copy"><small>Local do evento</small><strong>Canteiro Fest.</strong><span>R. Nicolau João Maluf, 869 · Cidade Nova, Uberaba/MG</span></span>
+          <span class="success-location-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+        </a>
+        <button class="submit" id="finish" type="button">Fechar</button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const modal = document.querySelector('#modal');
+    const open = document.querySelector('#openModal');
+    const close = document.querySelector('#closeModal');
+    const finish = document.querySelector('#finish');
+    const form = document.querySelector('#presenceForm');
+    const success = document.querySelector('#success');
+    const message = document.querySelector('#successMessage');
+    const celebrationLayer = document.querySelector('#celebrationLayer');
+    const STORE_KEY = 'piquenique_convidados';
+    const celebrationAssets = [
+      {src:'assets/celebration/bola-anim.png',type:'ball'},
+      {src:'assets/celebration/bola-listrada-anim.png',type:'ball'},
+      {src:'assets/celebration/bola-estrelas-anim.png',type:'ball'},
+      {src:'assets/celebration/coracao-anim.png',type:'heart'},
+      {src:'assets/celebration/coracao-duplo-anim.png',type:'heart'},
+      {src:'assets/celebration/coracao-contorno-anim.png',type:'heart'},
+      {src:'assets/celebration/pipa-anim.png',type:'kite'},
+      {src:'assets/celebration/pipa-rabiola-anim.png',type:'kite'},
+      {src:'assets/celebration/pipa-sol-anim.png',type:'kite'},
+      {src:'assets/celebration/ursinho-anim.png',type:'bear'}
+    ];
+    const celebrationReady=Promise.all(celebrationAssets.map(asset=>new Promise(resolve=>{const image=new Image();image.onload=()=>image.decode?image.decode().catch(()=>{}).finally(resolve):resolve();image.onerror=resolve;image.src=asset.src})));
+
+    function normalize(value){
+      return value.trim().toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    }
+
+    function getGuests(){
+      const saved = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+      if(saved.length) return saved;
+      const legacy = JSON.parse(localStorage.getItem('piquenique_confirmacoes') || '[]');
+      const migrated = legacy.map((item,index)=>({id:`legacy-${index}-${Date.now()}`,childName:item.childName,responsibleName:item.responsibleName,status:'confirmed',confirmedAt:item.confirmedAt || new Date().toISOString()}));
+      if(migrated.length) localStorage.setItem(STORE_KEY,JSON.stringify(migrated));
+      return migrated;
+    }
+
+    function saveGuests(guests){ localStorage.setItem(STORE_KEY,JSON.stringify(guests)); }
+
+    async function launchCelebration(){
+      if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      await celebrationReady;
+      celebrationLayer.replaceChildren();
+      const fragment=document.createDocumentFragment();
+      for(let index=0;index<36;index++){
+        const piece=document.createElement('img');
+        const asset=celebrationAssets[index%celebrationAssets.length];
+        piece.className=`celebration-piece piece--${asset.type}`;
+        piece.src=asset.src;
+        piece.alt='';
+        const direction=index%2===0?-1:1;
+        const burst=direction*(6+Math.random()*24);
+        const end=direction*(10+Math.random()*38);
+        const sizeRoll=Math.random();
+        const baseSize=sizeRoll>.86?90+Math.random()*34:sizeRoll>.4?50+Math.random()*30:28+Math.random()*22;
+        const size=asset.type==='kite'?baseSize*1.3:asset.type==='bear'?baseSize*1.08:baseSize;
+        const lane=index%14;
+        piece.style.setProperty('--start-x',`${3.5+lane*7.15+(Math.random()*2.6-1.3)}vw`);
+        piece.style.setProperty('--burst-x',`${burst}vw`);
+        piece.style.setProperty('--end-x',`${end}vw`);
+        piece.style.setProperty('--size',`${size}px`);
+        piece.style.setProperty('--delay',`${Math.floor(index/14)*.32+Math.random()*.42}s`);
+        piece.style.setProperty('--duration',`${asset.type==='kite'?5.1+Math.random()*1.1:asset.type==='bear'?5+Math.random()*.9:4.3+Math.random()*1.25}s`);
+        piece.style.setProperty('--spin-mid',`${direction*(120+Math.random()*220)}deg`);
+        piece.style.setProperty('--spin-end',`${direction*(420+Math.random()*520)}deg`);
+        fragment.append(piece);
+      }
+      celebrationLayer.append(fragment);
+      window.setTimeout(()=>celebrationLayer.replaceChildren(),7200);
+    }
+
+    function showModal(){
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+      document.body.style.overflow='hidden';
+      setTimeout(()=>document.querySelector('#childName').focus(),150);
+    }
+
+    function hideModal(){
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden','true');
+      document.body.style.overflow='';
+    }
+
+    open.addEventListener('click', showModal);
+    close.addEventListener('click', hideModal);
+    finish.addEventListener('click', hideModal);
+
+    modal.addEventListener('click', e => {
+      if(e.target === modal) hideModal();
+    });
+
+    document.addEventListener('keydown', e => {
+      if(e.key === 'Escape' && modal.classList.contains('open')) hideModal();
+    });
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+
+      const childName = document.querySelector('#childName').value.trim();
+      const responsibleName = document.querySelector('#responsibleName').value.trim();
+      if(!childName || !responsibleName) return;
+
+      /*
+        DEMONSTRAÇÃO:
+        Neste HTML, a confirmação é salva localmente.
+        Depois basta trocar este trecho pelo INSERT no Supabase.
+      */
+      const guests = getGuests();
+      const match = guests.find(item=>item.status==='pending' && (normalize(item.childName)===normalize(childName) || normalize(item.responsibleName)===normalize(responsibleName)));
+      if(match){
+        match.childName=childName;
+        match.responsibleName=responsibleName;
+        match.status='confirmed';
+        match.confirmedAt=new Date().toISOString();
+      }else{
+        guests.push({id:crypto.randomUUID(),childName,responsibleName,status:'confirmed',confirmedAt:new Date().toISOString()});
+      }
+      saveGuests(guests);
+
+      message.textContent = `${childName} está confirmado(a). Obrigado, ${responsibleName}!`;
+      form.classList.add('hide');
+      success.classList.add('show');
+      launchCelebration();
+    });
+  </script>
+</body>
+</html>
