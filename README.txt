@@ -1,17 +1,17 @@
-VERSÃO CORRIGIDA
+PIQUENIQUE DA GALERINHA
 
-Esta versão NÃO recria a hero em HTML/CSS.
+Projeto estático pronto para publicar no Vercel.
 
-Ela usa as próprias artes aprovadas:
-- assets/hero-desktop.png
-- assets/hero-mobile.png
+Arquivos principais:
+- index.html: convite, confirmação de presença e animação de celebração.
+- admin.html: página separada para administração.
+- assets/hero-desktop-sunday-v4.png: arte horizontal para desktop.
+- assets/hero-mobile-sunday-v4.png: arte vertical para celular.
+- assets/celebration/*-anim.png: dez imagens usadas na chuva de celebração.
 
-Por cima da imagem existem apenas:
-1. botão real "Confirmar presença", encaixado no espaço vazio da arte;
-2. área clicável no card "Canteiro Fest." abrindo o Google Maps;
-3. área clicável no endereço;
-4. modal com Nome da criança + Nome do responsável;
-5. animação leve somente no botão/modal.
+O evento está marcado para domingo, 11 de outubro de 2026.
+O botão de confirmação permanece interativo e encaixado na área tracejada.
+Após confirmar, as dez imagens de celebração caem de cima para baixo.
 
-A confirmação ainda está em modo demonstração (localStorage).
-A etapa seguinte é conectar ao Supabase e criar o admin.
+Observação: as confirmações desta versão de demonstração ficam no localStorage
+do navegador. A conexão com Supabase ainda precisa ser configurada.
